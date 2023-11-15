@@ -8,23 +8,38 @@ import { cn } from "@/lib/utils"
 import { ProductFilters } from "@/components/product-filters"
 import { ProductGrid } from "@/components/product-grid"
 import { ProductSort } from "@/components/product-sort"
+import sanityConfig from "@/sanity.config"
 
 interface Props {}
 
 export default async function Page() {
-  await seedSanityData()
+  console.log()
+  const products = await client.fetch<SanityProduct[]>(
+    groq`*[_type == "product"] | order(price asc){
+      _id,
+      _createdAt,
+      name,
+      sku,
+      images,
+      currency,
+      price,
+      description,
+      "slug": slug.current,
+    }`
+  )
+  console.log(products)
 
   return (
     <div>
       <div className="px-4 pt-20 text-center">
-        <h1 className="text-4xl font-extrabold tracking-normal">Binsaleh</h1>
-        <p className="mx-auto mt-4 max-w-3xl text-base">realtors</p>
+        <h1 className="text-4xl font-extrabold tracking-normal">{siteConfig.name}</h1>
+        <p className="mx-auto mt-4 max-w-3xl text-base">{siteConfig.description}</p>
       </div>
       <div>
         <main className="mx-auto max-w-6xl px-6">
           <div className="flex items-center justify-between border-b border-gray-200 pb-4 pt-24 dark:border-gray-800">
             <h1 className="text-xl font-bold tracking-tight sm:text-2xl">
-              0 products
+              {products.length} result{products.length === 1  ? "" : "s"} products
             </h1>
             {/* Product Sort */}
           </div>
